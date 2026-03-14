@@ -2,38 +2,34 @@ FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 WORKDIR /app
 
-# Install llama-cpp-python from pre-built wheel
+# Install llama-cpp-python pre-built wheel first
 RUN pip install --no-cache-dir \
     llama-cpp-python==0.3.16 \
     --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
 
-# Install remaining deps (let vieneu pick its own numpy version)
-RUN pip install --no-cache-dir \
+# Install vieneu without upgrading torch (base image already has correct torch+cuda)
+RUN pip install --no-cache-dir --no-deps \
+    "vieneu>=1.2.3" && \
+    pip install --no-cache-dir \
     runpod>=1.7.0 \
-    "vieneu>=1.2.3" \
-    huggingface_hub
+    huggingface_hub \
+    neucodec>=0.0.4 \
+    librosa>=0.11.0 \
+    phonemizer>=3.3.0 \
+    perth>=0.2.0 \
+    requests
 
-# Pre-download all models (no network needed at runtime)
+# Pre-download models
 RUN python -c "\
-from huggingface_hub import hf_hub_download; \
+from huggingface_hub import hf_hub_download, snapshot_download; \
 hf_hub_download('pnnbao-ump/VieNeu-TTS-0.3B-q4-gguf', 'VieNeu-TTS-0_3B-Q4_0.gguf'); \
 hf_hub_download('neuphonic/distill-neucodec', 'pytorch_model.bin'); \
 hf_hub_download('neuphonic/distill-neucodec', 'meta.yaml'); \
 hf_hub_download('ntu-spml/distilhubert', 'config.json'); \
 hf_hub_download('ntu-spml/distilhubert', 'model.safetensors'); \
 hf_hub_download('ntu-spml/distilhubert', 'preprocessor_config.json'); \
-print('Models downloaded')"
-
-# Pre-download transformers backbone (used instead of GGUF on RunPod)
-RUN python -c "\
-from huggingface_hub import snapshot_download; \
 snapshot_download('pnnbao-ump/VieNeu-TTS-0.3B'); \
-print('Backbone downloaded')"
-
-# Pre-download voice assets
-RUN python -c "\
-from vieneu import VieNeuTTS; \
-print('Importing VieNeuTTS OK')"
+print('All models downloaded')"
 
 COPY handler.py /app/handler.py
 
