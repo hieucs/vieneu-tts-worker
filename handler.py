@@ -56,9 +56,10 @@ def load_model():
     from vieneu import VieNeuTTS
 
     codec_device = os.getenv("CODEC_DEVICE", "cuda")
-    backbone = os.getenv("BACKBONE_REPO", "pnnbao-ump/VieNeu-TTS-0.3B-q4-gguf")
-    backbone_device = os.getenv("BACKBONE_DEVICE", "gpu")  # gpu = full GPU offload via llama-cpp
-    logger.info(f"Loading VieNeuTTS (backbone={backbone}, backbone_device={backbone_device}, codec={codec_device})...")
+    # Use transformers backbone on GPU (faster than GGUF, no llama-cpp CUDA issues)
+    backbone = os.getenv("BACKBONE_REPO", "pnnbao-ump/VieNeu-TTS-0.3B")
+    backbone_device = os.getenv("BACKBONE_DEVICE", "cuda")
+    logger.info(f"Loading VieNeuTTS (backbone={backbone}, device={backbone_device}, codec={codec_device})...")
     tts_model = VieNeuTTS(backbone_repo=backbone, backbone_device=backbone_device, codec_device=codec_device)
     logger.info("VieNeuTTS ready.")
     return tts_model
