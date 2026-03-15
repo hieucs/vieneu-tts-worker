@@ -3,16 +3,15 @@ FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 WORKDIR /app
 
 # Install vieneu --no-deps, then its deps + transformers for GPU backbone
+# Don't upgrade transformers/torchvision - base image versions work together
 RUN pip install --no-cache-dir --no-deps "vieneu==1.2.3" && \
+    pip install --no-cache-dir --no-deps neucodec>=0.0.4 && \
     pip install --no-cache-dir \
     runpod>=1.7.0 \
     huggingface_hub \
-    neucodec>=0.0.4 \
     librosa>=0.11.0 \
     phonemizer>=3.3.0 \
     perth>=0.2.0 \
-    transformers \
-    accelerate \
     requests
 
 # Pre-download transformers backbone (runs on GPU, no GGUF needed)
