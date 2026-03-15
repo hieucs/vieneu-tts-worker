@@ -56,8 +56,7 @@ def load_model():
     from vieneu import VieNeuTTS
 
     codec_device = os.getenv("CODEC_DEVICE", "cuda")
-    # Use non-GGUF transformers model on RunPod (no llama-cpp needed, plenty of RAM)
-    backbone = os.getenv("BACKBONE_REPO", "pnnbao-ump/VieNeu-TTS-0.3B")
+    backbone = os.getenv("BACKBONE_REPO", "pnnbao-ump/VieNeu-TTS-0.3B-q4-gguf")
     logger.info(f"Loading VieNeuTTS (backbone={backbone}, codec={codec_device})...")
     tts_model = VieNeuTTS(backbone_repo=backbone, codec_device=codec_device)
     logger.info("VieNeuTTS ready.")
