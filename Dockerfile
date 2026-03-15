@@ -13,6 +13,8 @@ RUN pip install --no-cache-dir --no-deps "vieneu>=1.2.3" && \
     perth>=0.2.0 \
     transformers \
     accelerate \
+    sea_g2p \
+    vieneu_utils \
     requests
 
 # Pre-download transformers backbone (runs on GPU, no GGUF needed)
