@@ -3,7 +3,7 @@ FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 WORKDIR /app
 
 # Install vieneu --no-deps, then its deps + transformers for GPU backbone
-RUN pip install --no-cache-dir --no-deps "vieneu>=1.2.3" && \
+RUN pip install --no-cache-dir --no-deps "vieneu==1.2.3" && \
     pip install --no-cache-dir \
     runpod>=1.7.0 \
     huggingface_hub \
@@ -13,8 +13,6 @@ RUN pip install --no-cache-dir --no-deps "vieneu>=1.2.3" && \
     perth>=0.2.0 \
     transformers \
     accelerate \
-    sea_g2p \
-    vieneu_utils \
     requests
 
 # Pre-download transformers backbone (runs on GPU, no GGUF needed)
