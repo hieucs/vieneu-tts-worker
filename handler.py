@@ -66,6 +66,17 @@ def load_model():
 
 
 def handler(event):
+    """RunPod serverless handler."""
+    try:
+        return _handle(event)
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        logger.error(f"Handler error: {tb}")
+        return {"error": str(e), "traceback": tb}
+
+
+def _handle(event):
     """RunPod serverless handler.
 
     Input (event["input"]):
