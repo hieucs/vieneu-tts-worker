@@ -2,16 +2,25 @@ FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 WORKDIR /app
 
-# Pin torch/torchvision to base image versions, then install vieneu with all deps
-RUN TORCH_VER=$(python -c "import torch; print(torch.__version__)") && \
-    TV_VER=$(python -c "import torchvision; print(torchvision.__version__)") && \
-    pip install --no-cache-dir \
-    "torch==${TORCH_VER}" \
-    "torchvision==${TV_VER}" \
-    torchaudio \
-    "vieneu==1.2.3" \
-    runpod>=1.7.0 && \
-    echo "Installed with torch=${TORCH_VER}"
+# Install torchaudio matching base torch (2.4.x + cu124)
+RUN pip install --no-cache-dir torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+# Install vieneu without deps (avoid torch version conflicts)
+RUN pip install --no-cache-dir --no-deps "vieneu==1.2.3"
+
+# Install all vieneu runtime deps manually
+RUN pip install --no-cache-dir \
+    runpod>=1.7.0 \
+    phonemizer>=3.3.0 \
+    neucodec>=0.0.4 \
+    librosa>=0.11.0 \
+    perth>=0.2.0 \
+    transformers \
+    accelerate \
+    local_attention \
+    torchtune \
+    requests \
+    huggingface_hub
 
 # Pre-download models
 RUN python -c "\
@@ -22,10 +31,10 @@ hf_hub_download('neuphonic/distill-neucodec', 'meta.yaml'); \
 hf_hub_download('ntu-spml/distilhubert', 'config.json'); \
 hf_hub_download('ntu-spml/distilhubert', 'model.safetensors'); \
 hf_hub_download('ntu-spml/distilhubert', 'preprocessor_config.json'); \
-print('Models downloaded')"
+print('Models OK')"
 
-# Verify import works
-RUN python -c "from vieneu import VieNeuTTS; print('VieNeuTTS import OK')"
+# Verify vieneu imports
+RUN python -c "from vieneu import VieNeuTTS; print('VieNeuTTS OK')"
 
 COPY handler.py /app/handler.py
 
