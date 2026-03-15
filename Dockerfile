@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir \
     librosa>=0.11.0 \
     phonemizer>=3.3.0 \
     perth>=0.2.0 \
+    local_attention \
     requests && \
     pip install --no-cache-dir --no-deps "vieneu==1.2.3" neucodec>=0.0.4
 
