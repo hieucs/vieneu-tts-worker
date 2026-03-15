@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir \
     neucodec>=0.0.4 \
     librosa>=0.11.0 \
     perth>=0.2.0 \
-    "transformers==4.44.2" \
+    "transformers>=4.46" \
     accelerate \
     local_attention \
     torchtune \
@@ -32,6 +32,9 @@ hf_hub_download('ntu-spml/distilhubert', 'config.json'); \
 hf_hub_download('ntu-spml/distilhubert', 'model.safetensors'); \
 hf_hub_download('ntu-spml/distilhubert', 'preprocessor_config.json'); \
 print('Models OK')"
+
+# Fix torchvision if broken by transformers upgrade
+RUN pip install --no-cache-dir torchvision --index-url https://download.pytorch.org/whl/cu124 || true
 
 # Verify vieneu imports
 RUN python -c "from vieneu import VieNeuTTS; print('VieNeuTTS OK')"
