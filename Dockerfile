@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir \
     neucodec>=0.0.4 \
     librosa>=0.11.0 \
     perth>=0.2.0 \
-    transformers \
+    "transformers==4.44.2" \
     accelerate \
     local_attention \
     torchtune \
