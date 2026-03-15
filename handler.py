@@ -174,7 +174,7 @@ def handler(event):
 if __name__ == "__main__":
     import runpod
 
-    # Pre-load model at cold start
-    load_model()
+    # Model loads lazily on first request (load_model() called inside handler)
+    logger.info("Worker starting, model will load on first request...")
 
     runpod.serverless.start({"handler": handler})
