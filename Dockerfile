@@ -1,19 +1,21 @@
-FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
+
+# Install Python 3.11
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 python3.11-venv python3-pip && \
+    ln -sf /usr/bin/python3.11 /usr/bin/python && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Install ALL torch ecosystem from same index to ensure compatibility
-RUN pip install --no-cache-dir \
-    torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cu124
-
-# Install vieneu with all deps (torch already pinned above)
+# Install vieneu with ALL its deps from scratch (no conflicting pre-installed packages)
 RUN pip install --no-cache-dir \
     "vieneu==1.2.3" \
-    runpod>=1.7.0
+    runpod>=1.7.0 \
+    --extra-index-url https://download.pytorch.org/whl/cu124
 
 # Verify
-RUN python -c "import torch; print(f'torch={torch.__version__}')" && \
+RUN python -c "import torch; print(f'torch={torch.__version__}, cuda={torch.cuda.is_available()}')" && \
     python -c "from vieneu import VieNeuTTS; print('VieNeuTTS OK')"
 
 # Pre-download models
