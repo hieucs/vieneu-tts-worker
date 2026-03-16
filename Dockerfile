@@ -21,8 +21,9 @@ RUN pip install --no-cache-dir \
 # Step 3: Install vieneu (torch already installed, pip won't downgrade)
 RUN pip install --no-cache-dir "vieneu==1.2.3" runpod>=1.7.0
 
-# Verify everything works
-RUN python -c "import torch; print(f'torch={torch.__version__}')" && \
+# Debug: check what's installed
+RUN pip list | grep -i "torch\|vieneu" && \
+    python -c "import torch; print(f'torch={torch.__version__}')" && \
     python -c "from vieneu import VieNeuTTS; print('VieNeuTTS OK')"
 
 # Pre-download models
