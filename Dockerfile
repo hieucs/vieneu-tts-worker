@@ -1,27 +1,28 @@
 FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
 
-# Install Python 3.11
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11 python3.11-dev python3.11-venv python3-pip \
-    build-essential cmake git && \
+    build-essential cmake git espeak-ng && \
     ln -sf /usr/bin/python3.11 /usr/bin/python && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Install llama-cpp-python pre-built wheel first
+# Step 1: Install torch+torchaudio+torchvision from PyTorch cu124 index
+RUN pip install --no-cache-dir \
+    torch torchaudio torchvision \
+    --index-url https://download.pytorch.org/whl/cu124
+
+# Step 2: Install llama-cpp-python pre-built wheel
 RUN pip install --no-cache-dir \
     llama-cpp-python==0.3.16 \
     --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
 
-# Install vieneu with all deps
-RUN pip install --no-cache-dir \
-    "vieneu==1.2.3" \
-    runpod>=1.7.0 \
-    --extra-index-url https://download.pytorch.org/whl/cu124
+# Step 3: Install vieneu (torch already installed, pip won't downgrade)
+RUN pip install --no-cache-dir "vieneu==1.2.3" runpod>=1.7.0
 
-# Verify
-RUN python -c "import torch; print(f'torch={torch.__version__}, cuda={torch.cuda.is_available()}')" && \
+# Verify everything works
+RUN python -c "import torch; print(f'torch={torch.__version__}')" && \
     python -c "from vieneu import VieNeuTTS; print('VieNeuTTS OK')"
 
 # Pre-download models
