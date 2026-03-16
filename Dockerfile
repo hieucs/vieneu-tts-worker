@@ -4,25 +4,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11 python3.11-dev python3.11-venv python3-pip \
     build-essential cmake git espeak-ng && \
     ln -sf /usr/bin/python3.11 /usr/bin/python && \
+    ln -sf /usr/bin/python3.11 /usr/bin/python3 && \
+    python -m pip install --upgrade pip && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Step 1: torch ecosystem from cu124
-RUN pip install --no-cache-dir \
+# All pip via "python -m pip" to ensure Python 3.11
+
+# Step 1: torch from cu124
+RUN python -m pip install --no-cache-dir \
     torch torchaudio torchvision \
     --index-url https://download.pytorch.org/whl/cu124
 
-# Step 2: llama-cpp-python pre-built
-RUN pip install --no-cache-dir \
+# Step 2: llama-cpp-python
+RUN python -m pip install --no-cache-dir \
     llama-cpp-python==0.3.16 \
     --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
 
-# Step 3: vieneu WITHOUT deps (to avoid torch conflict)
-RUN pip install --no-cache-dir --no-deps "vieneu==1.2.3"
+# Step 3: vieneu --no-deps
+RUN python -m pip install --no-cache-dir --no-deps "vieneu==1.2.3"
 
-# Step 4: All vieneu deps EXCEPT torch/torchaudio (already installed)
-RUN pip install --no-cache-dir \
+# Step 4: vieneu deps (no torch)
+RUN python -m pip install --no-cache-dir \
     phonemizer>=3.3.0 \
     neucodec>=0.0.4 \
     librosa>=0.11.0 \
