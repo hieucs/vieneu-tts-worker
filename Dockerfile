@@ -2,13 +2,19 @@ FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
 
 # Install Python 3.11
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.11 python3.11-venv python3-pip && \
+    python3.11 python3.11-dev python3.11-venv python3-pip \
+    build-essential cmake git && \
     ln -sf /usr/bin/python3.11 /usr/bin/python && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Install vieneu with ALL its deps from scratch (no conflicting pre-installed packages)
+# Install llama-cpp-python pre-built wheel first
+RUN pip install --no-cache-dir \
+    llama-cpp-python==0.3.16 \
+    --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
+
+# Install vieneu with all deps
 RUN pip install --no-cache-dir \
     "vieneu==1.2.3" \
     runpod>=1.7.0 \
